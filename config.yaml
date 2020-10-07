@@ -1,0 +1,6 @@
+server-version: "1.1"
+debug: true
+port: 50069
+persistence:
+  use-persistent-connections: true
+  persistent-connection-timeout: 6000
