@@ -10,6 +10,15 @@ import java.util.Map;
 
 public class Utility {
 
+    /**
+     * Helper method to build the header string
+     * @param cc - client connection object, used to get certain server info
+     * @param rc - the response code to send to the client (200, 404, etc.)
+     * @param extraHeaders - a list of extra headers such as set-cookie etc.
+     * @param mimeType - the mime type of the returned data
+     * @param contentLength - the length (in bytes) of the content returned
+     * @return - A string containing all of the headers delimited by a newline
+     */
     public static String buildHeaders(ClientConnection cc, ResponseCode rc, List<String> extraHeaders, String mimeType, int contentLength) {
         String ret = "";
         ret += "HTTP/1.1 " + rc.code + " " + rc.text + "\n";
@@ -49,9 +58,9 @@ public class Utility {
         return data;
     }
 
-    public static byte[] stringToByteArray(String str) throws IOException {
+    /*public static byte[] stringToByteArray(String str) throws IOException {
         return str.getBytes("UTF-8");
-    }
+    }*/
 
     /**
      * The function traverses the list of headers to find each line that begins with "Cookie: ". Then it splits up that line into key value pairs which it puts into the cookie map.
@@ -88,6 +97,12 @@ public class Utility {
         return cookie;
     }
 
+
+    /**
+     * Checks if provided string only contains numbers
+     * @param s - String to check
+     * @return - true if string only contains numbers, false otherwise
+     */
     public static boolean isNumeric(String s) {
         if (s == null)
             return false;

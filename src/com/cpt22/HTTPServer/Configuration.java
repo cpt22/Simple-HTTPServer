@@ -7,6 +7,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Map;
 
+/**
+ * Configuration class based on the SnakeYAML library
+ */
 public class Configuration {
     Yaml confFile = new Yaml();
     Map<String, Object> config = null;
@@ -23,6 +26,10 @@ public class Configuration {
         load(filename);
     }
 
+    /**
+     * Loads the YAML configuration file from the specified path.
+     * @param path - path to configuration file
+     */
     private void load(String path) {
         try {
             config = confFile.load(new FileInputStream(new File(path)));
@@ -32,6 +39,12 @@ public class Configuration {
         }
     }
 
+    /**
+     * Fetches a configuration section in the form of another configuration object. A section is a nested multi value YAML element
+     * @param key - the key of the multi variable attribute in the YAML file
+     * @return - A new configuration object containing a map of all of the elements in the configuration object.
+     * @throws YAMLConfigurationException
+     */
     public Configuration getSection(String key) throws YAMLConfigurationException {
         Object obj = config.get(key);
         if (obj != null && obj instanceof Map) {
@@ -41,6 +54,12 @@ public class Configuration {
         }
     }
 
+    /**
+     * Fetches a boolean at the specified key
+     * @param key - the key of the boolean value to be fetched
+     * @return - the boolean value of the YAML attribute
+     * @throws YAMLConfigurationException - Thrown if the attribute is not found(null) or the value is not of the expected type.
+     */
     public Boolean getBoolean(String key) throws YAMLConfigurationException {
         Object obj = config.get(key);
         if (obj != null && obj instanceof Boolean) {
@@ -50,7 +69,13 @@ public class Configuration {
         }
     }
 
-    public Boolean getBoolean(String key, boolean def) throws YAMLConfigurationException {
+    /**
+     * Fetches a boolean at the specified key or returns the default value if the key is not found
+     * @param key - the key of the boolean value to be fetched
+     * @param def - the default value to be returned if the value is not found
+     * @return - the boolean value of the YAML attribute or the default value
+     */
+    public Boolean getBoolean(String key, boolean def) {
         Object obj = config.get(key);
         if (obj != null && obj instanceof Boolean) {
             return (Boolean) obj;
@@ -60,6 +85,12 @@ public class Configuration {
         }
     }
 
+    /**
+     * Fetches an integer at the specified key
+     * @param key - the key of the integer value to be fetched
+     * @return - the integer value of the YAML attribute
+     * @throws YAMLConfigurationException - Thrown if the attribute is not found(null) or the value is not of the expected type.
+     */
     public Integer getInt(String key) throws YAMLConfigurationException {
         Object obj = config.get(key);
         if (obj != null && obj instanceof Integer) {
@@ -69,7 +100,13 @@ public class Configuration {
         }
     }
 
-    public Integer getInt(String key, int def) throws YAMLConfigurationException {
+    /**
+     * Fetches an integer at the specified key or returns the default value if the key is not found
+     * @param key - the key of the integer value to be fetched
+     * @param def - the default value to be returned if the value is not found
+     * @return - the integer value of the YAML attribute or the default value
+     */
+    public Integer getInt(String key, int def) {
         Object obj = config.get(key);
         if (obj != null && obj instanceof Integer) {
             return (Integer) obj;
@@ -79,12 +116,34 @@ public class Configuration {
         }
     }
 
+    /**
+     * Fetches a String at the specified key
+     * @param key - the key of the String value to be fetched
+     * @return - the String value of the YAML attribute
+     * @throws YAMLConfigurationException - Thrown if the attribute is not found(null) or the value is not of the expected type.
+     */
     public String getString(String key) throws YAMLConfigurationException {
         Object obj = config.get(key);
         if (obj != null && obj instanceof String) {
             return (String) obj;
         } else {
             throw new YAMLConfigurationException("Expected type String for key '" + key + "' but found " + (obj != null ? obj.getClass().getName() : "null"));
+        }
+    }
+
+    /**
+     * Fetches a String at the specified key or returns the default value if the key is not found
+     * @param key - the key of the String value to be fetched
+     * @param def - the default value to be returned if the value is not found
+     * @return - the String value of the YAML attribute or the default value
+     */
+    public String getString(String key, String def) {
+        Object obj = config.get(key);
+        if (obj != null && obj instanceof String) {
+            return (String) obj;
+        } else {
+            System.err.println("Expected type Boolean for key '" + key + "' but found " + (obj != null ? obj.getClass().getName() : "null"));
+            return def;
         }
     }
 }
