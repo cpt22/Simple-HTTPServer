@@ -36,7 +36,7 @@ public class Logger {
 
     public void logRequest(String ip, String hostname, String request, String status) {
         if (enabled) {
-            httpLogFileWriter.printf("%-40s %-40s %-40s %-40s %-3s %n", ip, hostname, dateFormatter.format(new Date()), request, status);
+            httpLogFileWriter.printf("%-27s %-40s %-23s %-60s %7s %n", ip, hostname, dateFormatter.format(new Date()), request, status);
             httpLogFileWriter.flush();
         }
     }

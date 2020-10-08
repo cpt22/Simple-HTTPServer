@@ -87,6 +87,10 @@ public class ClientConnection implements Runnable {
                     filePath = filePath.substring(1);
                 }
 
+                if (filePath.substring(filePath.length() - 1).equals("/")) {
+                    filePath += config.getString("index-page", "index.html");
+                }
+
                 // This server only handles GET requests for now
                 if (method.equalsIgnoreCase("GET")) {
                     // Loads the file at the specified filePath

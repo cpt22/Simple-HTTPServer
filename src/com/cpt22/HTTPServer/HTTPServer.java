@@ -34,7 +34,7 @@ public class HTTPServer implements Runnable {
         try {
             servSock = new ServerSocket();
             servSock.bind(new InetSocketAddress(InetAddress.getByName(bindAddr), port));
-            System.out.println("HTTP Server started " + (config.getBoolean("debug", false) ? "IN DEBUG MODE" : "") + " using " + (config.getSection("persistence").getBoolean("use-persistent-connections", true) ? "persistent connections" : "non-persistent connections"));
+            System.out.println("HTTP Server started " + (config.getBoolean("debug", false) ? "IN DEBUG MODE " : "") + "using " + (config.getSection("persistence").getBoolean("use-persistent-connections", true) ? "persistent connections" : "non-persistent connections"));
             System.out.println("Listening for requests on " + bindAddr + ":" + port);
             this.run();
         } catch (IOException e) {
