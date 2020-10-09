@@ -11,8 +11,8 @@ import java.util.Map;
  * Configuration class based on the SnakeYAML library
  */
 public class Configuration {
-    Yaml confFile = new Yaml();
-    Map<String, Object> config = null;
+    private Yaml confFile = new Yaml();
+    private Map<String, Object> config = null;
 
     public Configuration() {
         load("./config.yaml");
@@ -33,8 +33,7 @@ public class Configuration {
     private void load(String path) {
         try {
             config = confFile.load(new FileInputStream(new File(path)));
-        } catch (
-                FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -47,7 +46,7 @@ public class Configuration {
      */
     public Configuration getSection(String key) throws YAMLConfigurationException {
         Object obj = config.get(key);
-        if (obj != null && obj instanceof Map) {
+        if (obj instanceof Map) {
             return new Configuration((Map<String, Object>) obj);
         } else {
             throw new YAMLConfigurationException("Expected type Config Section for key '" + key);
@@ -62,7 +61,7 @@ public class Configuration {
      */
     public Boolean getBoolean(String key) throws YAMLConfigurationException {
         Object obj = config.get(key);
-        if (obj != null && obj instanceof Boolean) {
+        if (obj instanceof Boolean) {
             return (Boolean) obj;
         } else {
             throw new YAMLConfigurationException("Expected type Boolean for key '" + key + "' but found " + (obj != null ? obj.getClass().getName() : "null"));
@@ -77,7 +76,7 @@ public class Configuration {
      */
     public Boolean getBoolean(String key, boolean def) {
         Object obj = config.get(key);
-        if (obj != null && obj instanceof Boolean) {
+        if (obj instanceof Boolean) {
             return (Boolean) obj;
         } else {
             System.err.println("Expected type Boolean for key '" + key + "' but found " + (obj != null ? obj.getClass().getName() : "null"));
@@ -93,7 +92,7 @@ public class Configuration {
      */
     public Integer getInt(String key) throws YAMLConfigurationException {
         Object obj = config.get(key);
-        if (obj != null && obj instanceof Integer) {
+        if (obj instanceof Integer) {
             return (Integer) config.get(key);
         } else {
             throw new YAMLConfigurationException("Expected type Integer for key '" + key + "' but found " + (obj != null ? obj.getClass().getName() : "null"));
@@ -108,7 +107,7 @@ public class Configuration {
      */
     public Integer getInt(String key, int def) {
         Object obj = config.get(key);
-        if (obj != null && obj instanceof Integer) {
+        if (obj instanceof Integer) {
             return (Integer) obj;
         } else {
             System.err.println("Expected type Boolean for key '" + key + "' but found " + (obj != null ? obj.getClass().getName() : "null"));
@@ -124,7 +123,7 @@ public class Configuration {
      */
     public String getString(String key) throws YAMLConfigurationException {
         Object obj = config.get(key);
-        if (obj != null && obj instanceof String) {
+        if (obj instanceof String) {
             return (String) obj;
         } else {
             throw new YAMLConfigurationException("Expected type String for key '" + key + "' but found " + (obj != null ? obj.getClass().getName() : "null"));
@@ -139,7 +138,7 @@ public class Configuration {
      */
     public String getString(String key, String def) {
         Object obj = config.get(key);
-        if (obj != null && obj instanceof String) {
+        if (obj instanceof String) {
             return (String) obj;
         } else {
             System.err.println("Expected type Boolean for key '" + key + "' but found " + (obj != null ? obj.getClass().getName() : "null"));

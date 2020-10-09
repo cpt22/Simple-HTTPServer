@@ -10,4 +10,10 @@ files:
   root-dir: "."
 logging:
   enabled: true
-  log-file-path: "./http-log"
+  http-log-file-path: "."
+  http-log-file-name: "http_log"
+  http-log-file-max-length: 150
+  error-log-file-path: "."
+  error-log-file-name: "error_log"
+  error-log-file-max-length: 150
+  error-log-minlevel: WARN    #Options: DEBUG, VERBOSE, INFO, WARN (default), SEVERE, FATAL

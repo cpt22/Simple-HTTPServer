@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ClientConnection implements Runnable {
-    static File WEB_ROOT;
+    private static File WEB_ROOT;
     private HTTPServer server;
 
     private Socket socket;
@@ -65,8 +65,8 @@ public class ClientConnection implements Runnable {
                 // Parse all of the cookies and store them in the cookie Map
                 cookies = Utility.parseCookies(headers);
 
-                if (server.isDebugging())
-                    System.out.println("Request received from client");
+                getLogger().errorLog(socket.getInetAddress().getHostAddress(), LogLevel.VERBOSE, "Request received from client");
+
                 // Debug headers and cookies
                 if (server.isDebugging()) {
                     System.out.println("\nRECEIVED HEADERS:");
@@ -96,7 +96,7 @@ public class ClientConnection implements Runnable {
                     // Loads the file at the specified filePath
                     File file = new File(WEB_ROOT, filePath);
                     if (file.length() == 0) {
-                        server.getLogger().logRequest(socket.getInetAddress().getHostAddress(), socket.getInetAddress().getHostName(), headers.get(0), String.valueOf(ResponseCode.FILE_NOT_FOUND.code));
+                        getLogger().logRequest(socket.getInetAddress().getHostAddress(), socket.getInetAddress().getHostName(), headers.get(0), String.valueOf(ResponseCode.FILE_NOT_FOUND.code));
                         throw new FileNotFoundException();
                     }
 
@@ -124,17 +124,20 @@ public class ClientConnection implements Runnable {
                     additionalHeaders.add(Utility.buildCookie("visits", String.valueOf(visitCount), "Path: cpt15"));
 
                     // Sends the HTTP response
-                    server.getLogger().logRequest(socket.getInetAddress().getHostAddress(), socket.getInetAddress().getHostName(), headers.get(0), String.valueOf(ResponseCode.OK.code));
-                    sendResponse(ResponseCode.OK, additionalHeaders, fileString);
+                    getLogger().logRequest(socket.getInetAddress().getHostAddress(), socket.getInetAddress().getHostName(), headers.get(0), String.valueOf(ResponseCode.OK.code));
+                    if (!sendResponse(ResponseCode.OK, additionalHeaders, fileString)) {
+                        getLogger().errorLog(socket.getInetAddress().getHostAddress(), LogLevel.INFO, "Error sending response to client");
+                    }
                 } else {
                     // Send this response if the client sents a request with an unsupported method
-                    sendResponse(ResponseCode.OK, new File(WEB_ROOT, "method-not-supported.html"));
+                    if (!sendResponse(ResponseCode.OK, new File(WEB_ROOT, "method-not-supported.html"))) {
+                        getLogger().errorLog(socket.getInetAddress().getHostAddress(), LogLevel.INFO, "Error sending response to client");
+                    }
                 }
 
                 // If connections are not persistent, close all socket connections.
                 if (!server.areConnectionsPersistent()) {
-                    if (server.isDebugging())
-                        System.out.println("Connection with a client closed");
+                    getLogger().errorLog(socket.getInetAddress().getHostAddress(), LogLevel.VERBOSE, "Connection with a client closed (non-persistent)");
                     in.close();
                     bytesOut.close();
                     out.close();
@@ -144,14 +147,16 @@ public class ClientConnection implements Runnable {
             } catch (FileNotFoundException ex) {
                 try {
                     // Send the 404 response and error page if the specified URL is not found
-                    sendResponse(ResponseCode.FILE_NOT_FOUND, new File(WEB_ROOT, ResponseCode.FILE_NOT_FOUND.path));
+                    if(!sendResponse(ResponseCode.FILE_NOT_FOUND, new File(WEB_ROOT, ResponseCode.FILE_NOT_FOUND.path))) {
+                        getLogger().errorLog(socket.getInetAddress().getHostAddress(), LogLevel.INFO, "Error sending response to client");
+                    }
                 } catch (IOException ioex) {
+                    getLogger().errorLog(socket.getInetAddress().getHostAddress(), LogLevel.SEVERE, "An exception was encountered in generating the 404 error page " + ioex.getMessage());
                     System.err.println("An exception was encountered in generating the error page: " + ioex.getMessage());
                 }
             } catch (SocketTimeoutException ex) {
                 // Catch the SocketTimeoutException and close all of the streams and socket.
-                if (server.isDebugging())
-                    System.out.println("Connection with a client timed out");
+                getLogger().errorLog(socket.getInetAddress().getHostAddress(), LogLevel.VERBOSE, "Connection with a client timed out and was closed (persistent)");
                 try {
                     in.close();
                     bytesOut.close();
@@ -168,6 +173,9 @@ public class ClientConnection implements Runnable {
         }
     }
 
+    public Logger getLogger() {
+        return server.getLogger();
+    }
 
     /**
      * Sends a response to the client provided a response code and a file to send
@@ -175,8 +183,8 @@ public class ClientConnection implements Runnable {
      * @param file - The file to send
      * @throws IOException
      */
-    private void sendResponse(ResponseCode code, Object file) throws IOException {
-        sendResponse(code, null, file);
+    private boolean sendResponse(ResponseCode code, Object file) throws IOException {
+        return sendResponse(code, null, file);
     }
 
     /**
