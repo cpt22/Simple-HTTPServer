@@ -1,19 +1,21 @@
+# This is the yaml configuration for Christian's HTTP Server for CSDS325
+# Please remember YAML files use tab indentation and NOT spaces.
 server-version: "1.0"
 debug: false
 bind-address: "0.0.0.0"
 port: 50069
 index-page: "index.html"
 persistence:
-  use-persistent-connections: false
-  persistent-connection-timeout: 6000
+  use-persistent-connections: false   # Whether or not to maintain persistent TCP connections with clients
+  persistent-connection-timeout: 60000 # TCP connection timeout length in milliseconds -> Default: 6000
 files:
   root-dir: "."
 logging:
   enabled: true
   http-log-file-path: "."
   http-log-file-name: "http_log"
-  http-log-file-max-length: 150
+  http-log-file-max-length: 150    # Max http log file length in lines -> Default: 150
   error-log-file-path: "."
   error-log-file-name: "error_log"
-  error-log-file-max-length: 150
-  error-log-minlevel: WARN    #Options: DEBUG, VERBOSE, INFO, WARN (default), SEVERE, FATAL
+  error-log-file-max-length: 150   # Max error log file length in lines -> Default: 150
+  error-log-minlevel: INFO         # Options: DEBUG, VERBOSE, INFO, WARN (default), SEVERE, FATAL

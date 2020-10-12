@@ -102,7 +102,7 @@ public class Logger {
                     checkErrorLogFileLength();
                 }
             } else {
-                if (level == LogLevel.FATAL) {
+                if (level.val >= LogLevel.SEVERE.val) {
                     System.err.println("[" + dateFormatter.format(new Date()) + "] [" + level.text + "] [client " + ip + "] : " + message);
                 }
 

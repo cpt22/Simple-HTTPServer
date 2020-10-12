@@ -98,13 +98,4 @@ public class HTTPServer implements Runnable {
             }
         }
     }
-
-
-    /**
-     * Static methods to instantiate server
-     */
-    private static HTTPServer server;
-    public static void main(String[] args) {
-        server = new HTTPServer();
-    }
 }
