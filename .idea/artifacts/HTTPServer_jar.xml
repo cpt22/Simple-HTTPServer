@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="HTTPServer:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/HTTPServer_jar</output-path>
+    <root id="archive" name="HTTPServer.jar">
+      <element id="module-output" name="HTTPServer" />
+      <element id="extracted-dir" path="$USER_HOME$/Downloads/snakeyaml-1.27.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

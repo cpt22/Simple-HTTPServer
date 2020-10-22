@@ -2,9 +2,10 @@ package com.cpt22.HTTPServer;
 
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 /**
@@ -15,7 +16,7 @@ public class Configuration {
     private Map<String, Object> config = null;
 
     public Configuration() {
-        load("./config.yaml");
+        load("./configuration/config.yaml");
     }
 
     private Configuration(Map<String, Object> section) {
@@ -32,8 +33,16 @@ public class Configuration {
      */
     private void load(String path) {
         try {
+            Path target = Paths.get(path);
+            if (!Files.exists(target)) {
+                Files.createDirectories(target.getParent());
+                InputStream in = getClass().getResourceAsStream("/default_config.yaml");
+                Files.copy(in, target);
+            }
             config = confFile.load(new FileInputStream(new File(path)));
         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

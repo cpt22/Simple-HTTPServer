@@ -2,7 +2,7 @@ package com.cpt22.HTTPServer;
 
 public enum ResponseCode {
     OK(200, "OK", ""),
-    FILE_NOT_FOUND(404, "File Not Found", "cpt15/404.html");
+    FILE_NOT_FOUND(404, "File Not Found", "404.html");
 
     public final String text;
     public final int code;

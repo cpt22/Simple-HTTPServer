@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,6 +50,15 @@ public class Logger {
             this.httpLogFileMaxLength = configSection.getInt("http-log-file-max-length", 150);
             this.httpLogFilePath = httpLogFileBasePath + httpLogFileName;
             this.httpLogFile = new File(httpLogFilePath);
+            try {
+                if (!Files.exists(Paths.get(httpLogFilePath))) {
+                    Files.createDirectories(Paths.get(httpLogFileBasePath));
+                    Files.createFile(Paths.get(httpLogFilePath));
+                    this.httpLogFileWriter = new PrintWriter(new FileWriter(httpLogFilePath, true));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             this.httpLogFileWriter = new PrintWriter(new FileWriter(httpLogFilePath, true));
 
             this.errorLogFileBasePath = configSection.getString("error-log-file-path", ".") + "/";
@@ -56,6 +66,15 @@ public class Logger {
             this.errorLogFileMaxLength = configSection.getInt("error-log-file-max-length", 150);
             this.errorLogFilePath = errorLogFileBasePath + errorLogFileName;
             this.errorLogFile = new File(errorLogFilePath);
+            try {
+                if (!Files.exists(Paths.get(errorLogFilePath))) {
+                    Files.createDirectories(Paths.get(errorLogFileBasePath));
+                    Files.createFile(Paths.get(errorLogFilePath));
+                    this.errorLogFileWriter = new PrintWriter(new FileWriter(errorLogFilePath, true));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             this.errorLogFileWriter = new PrintWriter(new FileWriter(errorLogFilePath, true));
             this.errorLogMinLogLevel = LogLevel.valueOf(configSection.getString("error-log-minlevel", "WARN"));
         } catch (YAMLConfigurationException e) {
@@ -66,15 +85,6 @@ public class Logger {
     }
 
     public void logRequest(String ip, String hostname, String request, String status) {
-        try {
-            if (!Files.exists(Paths.get(httpLogFilePath))) {
-                Files.createFile(Paths.get(httpLogFilePath));
-                this.httpLogFileWriter = new PrintWriter(new FileWriter(httpLogFilePath, true));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         if (enabled) {
             httpLogFileWriter.printf("%-27s %-40s %-23s %-60s %7s %n", ip, hostname, dateFormatter.format(new Date()), request, status);
             httpLogFileWriter.flush();
@@ -83,15 +93,6 @@ public class Logger {
     }
 
     public void errorLog(String ip, LogLevel level, String message) {
-        try {
-            if (!Files.exists(Paths.get(errorLogFilePath))) {
-                Files.createFile(Paths.get(errorLogFilePath));
-                this.errorLogFileWriter = new PrintWriter(new FileWriter(errorLogFilePath, true));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         if (enabled && (level.val >= errorLogMinLogLevel.val || server.isDebugging())) {
             if (level == LogLevel.DEBUG || server.isDebugging()) {
                 System.out.println("[" + dateFormatter.format(new Date()) + "] [" + level.text + "] [client " + ip + "] : " + message);
@@ -116,7 +117,7 @@ public class Logger {
     private void checkHttpLogFileLength() {
         try {
             Path filepath = Paths.get(httpLogFilePath);
-            if (Files.exists(filepath) && Files.readAllLines(filepath).size() >= httpLogFileMaxLength) {
+            if (Files.exists(filepath) && Files.readAllLines(filepath, Charset.defaultCharset()).size() >= httpLogFileMaxLength) {
                 int i = 1;
                 while(Files.exists(Paths.get(httpLogFilePath + "_" + i))) {
                     i++;
@@ -132,7 +133,7 @@ public class Logger {
     private void checkErrorLogFileLength() {
         try {
             Path filepath = Paths.get(errorLogFilePath);
-            if (Files.exists(filepath) && Files.readAllLines(filepath).size() >= errorLogFileMaxLength) {
+            if (Files.exists(filepath) && Files.readAllLines(filepath, Charset.defaultCharset()).size() >= errorLogFileMaxLength) {
                 int i = 1;
                 while(Files.exists(Paths.get(errorLogFilePath + "_" + i))) {
                     i++;

@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -108,13 +110,8 @@ public class ClientConnection implements Runnable {
                     }
                 }
 
-
                 String method = headers.get(0).split(" ")[0];
                 String filePath = headers.get(0).split(" ")[1];
-                // Strip preceding / from request URL
-                if (filePath.indexOf("/") == 0) {
-                    filePath = filePath.substring(1);
-                }
 
                 if (filePath.substring(filePath.length() - 1).equals("/")) {
                     filePath += config.getString("index-page", "index.html");
@@ -122,9 +119,10 @@ public class ClientConnection implements Runnable {
 
                 // This server only handles GET requests for now
                 if (method.equalsIgnoreCase("GET")) {
+
                     // Loads the file at the specified filePath
-                    File file = new File(WEB_ROOT, filePath);
-                    if (file.length() == 0) {
+                    File file = new File(WEB_ROOT + filePath);
+                    if (!Files.exists(Paths.get(WEB_ROOT + filePath))) {
                         getLogger().logRequest(socket.getInetAddress().getHostAddress(), socket.getInetAddress().getHostName(), headers.get(0), String.valueOf(ResponseCode.FILE_NOT_FOUND.code));
                         throw new FileNotFoundException();
                     }
@@ -175,8 +173,14 @@ public class ClientConnection implements Runnable {
                 }
             } catch (FileNotFoundException ex) {
                 try {
+                    /*File err = null;
                     // Send the 404 response and error page if the specified URL is not found
-                    if(!sendResponse(ResponseCode.FILE_NOT_FOUND, new File(WEB_ROOT, ResponseCode.FILE_NOT_FOUND.path))) {
+                    if (!Files.exists(Paths.get(WEB_ROOT + "/" + ResponseCode.FILE_NOT_FOUND.path))) {
+                        system.out.println("gingwr")
+                    } else {
+
+                    }*/
+                    if(!sendResponse(ResponseCode.FILE_NOT_FOUND, "<html><head><title>Page not found</title></head><body>404 Page not found</body></html>")){//new File(WEB_ROOT, ResponseCode.FILE_NOT_FOUND.path))) {
                         getLogger().errorLog(socket.getInetAddress().getHostAddress(), LogLevel.INFO, "Error sending response to client");
                     }
                 } catch (IOException ex1) {

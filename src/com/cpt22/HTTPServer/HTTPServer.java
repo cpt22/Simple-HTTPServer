@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -78,6 +80,15 @@ public class HTTPServer implements Runnable {
             this.bindAddr = config.getString("bind-address", "0.0.0.0");
             this.port = config.getInt("port", 80);
             this.version = config.getString("server-version");
+            String webRoot = config.getSection("files").getString("root-dir");
+            try {
+                if (!Files.exists(Paths.get(webRoot))) {
+                    Files.createDirectories(Paths.get(webRoot));
+
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         } catch (YAMLConfigurationException ex) {
             System.err.println(ex.getMessage());
         }

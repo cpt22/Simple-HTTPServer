@@ -75,7 +75,7 @@ public class Utility {
                 String[] cookies = line.split("; ");
                 for (int i = 0; i < cookies.length; i++) {
                     String[] cookie = cookies[i].split("=");
-                    cookieMap.put(cookie[0], cookie[1]);
+                    cookieMap.put(cookie[0], cookie.length > 1 ? cookie[1] : "");
                 }
             }
         }
