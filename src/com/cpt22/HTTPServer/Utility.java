@@ -21,19 +21,19 @@ public class Utility {
      */
     public static String buildHeaders(ClientConnection cc, ResponseCode rc, List<String> extraHeaders, String mimeType, int contentLength) {
         String ret = "";
-        ret += "HTTP/1.1 " + rc.code + " " + rc.text + "\n";
-        ret += "Server: Christian Tingles HTTP Server v" + cc.getServer().getVersion() + "\n";
-        ret += "Date: " + new Date() + "\n";
-        ret += "Content-type: " + mimeType + "\n";
-        ret += "Content-length: " + contentLength + "\n";
+        ret += "HTTP/1.1 " + rc.code + " " + rc.text + "\r\n";
+        ret += "Server: Christian Tingles HTTP Server v" + cc.getServer().getVersion() + "\r\n";
+        ret += "Date: " + new Date() + "\r\n";
+        ret += "Content-type: " + mimeType + "\r\n";
+        ret += "Content-length: " + contentLength + "\r\n";
         if (!cc.getServer().areConnectionsPersistent())
-            ret += "Connection: close\n";
+            ret += "Connection: close\r\n";
         if (extraHeaders != null) {
             for (int i = 0; i < extraHeaders.size(); i++) {
-                ret += extraHeaders.get(i) + "\n";
+                ret += extraHeaders.get(i) + "\r\n";
             }
         }
-        ret += "\n";
+        ret += "\r\n";
         return ret;
     }
 
@@ -57,10 +57,6 @@ public class Utility {
 
         return data;
     }
-
-    /*public static byte[] stringToByteArray(String str) throws IOException {
-        return str.getBytes("UTF-8");
-    }*/
 
     /**
      * The function traverses the list of headers to find each line that begins with "Cookie: ". Then it splits up that line into key value pairs which it puts into the cookie map.
@@ -106,7 +102,6 @@ public class Utility {
     public static boolean isNumeric(String s) {
         if (s == null)
             return false;
-
         try {
             Integer.parseInt(s);
             return true;

@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -21,15 +22,12 @@ public class ClientConnection implements Runnable {
     private BufferedOutputStream bytesOut;
     private Configuration config;
 
-    private int connectionTimeout;
-
-
     public ClientConnection(Socket socket, HTTPServer server) {
         this.socket = socket;
         this.server = server;
         this.config = server.getConfig();
         try {
-            WEB_ROOT = new File(config.getSection("files").getString("root-dir", "."));
+            WEB_ROOT = new File(config.getSection("files").getString("web-root", "."));
         } catch (YAMLConfigurationException e) {
             e.printStackTrace();
         }
@@ -54,9 +52,9 @@ public class ClientConnection implements Runnable {
 
         // While the socket is not timed out or closed, listen for and process HTTP requests
         while(true) {
-            List<String> headers = new ArrayList<String>();
-            Map<String, String> headerMap = new HashMap<String, String>();
-            Map<String, String> cookies = new HashMap<String, String>();
+            List<String> headers = new ArrayList<>();
+            Map<String, String> headerMap = new HashMap<>();
+            Map<String, String> cookies;
             try {
                 // Open input and output streams/writers to facilitate communication with the client
                 in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -97,7 +95,7 @@ public class ClientConnection implements Runnable {
                     try {
                         String hdr = headerMap.get("keep-alive");
                         String[] attrSplit = hdr.split(",");
-                        Map<String, String> tempMap = new HashMap<String, String>();
+                        Map<String, String> tempMap = new HashMap<>();
                         for (String s : attrSplit) {
                             String[] tmp = s.split("=");
                             tempMap.put(tmp[0], tmp[1]);
@@ -134,9 +132,9 @@ public class ClientConnection implements Runnable {
                     }
 
                     // Sets up symbols for replacement within HTML files. This is used to insert the number of visits dynamically into the visits.html
-                    Map<String, Object> symbolMap = new HashMap<String, Object>();
+                    Map<String, Object> symbolMap = new HashMap<>();
                     switch (filePath) {
-                        case "cpt15/visits.html":
+                        case "/cpt15/visits.html":
                             symbolMap.put("visits", visitCount);
                             break;
                         default:
@@ -147,7 +145,7 @@ public class ClientConnection implements Runnable {
                     String fileString = FileParser.parseFile(file, symbolMap);
 
                     // Specifies additional headers to send (Such as set-cookie headers) along with the standard headers
-                    List<String> additionalHeaders = new ArrayList<String>();
+                    List<String> additionalHeaders = new ArrayList<>();
                     additionalHeaders.add(Utility.buildCookie("visits", String.valueOf(visitCount), "Path: cpt15"));
 
                     // Sends the HTTP response
@@ -156,7 +154,7 @@ public class ClientConnection implements Runnable {
                         getLogger().errorLog(socket.getInetAddress().getHostAddress(), LogLevel.INFO, "Error sending response to client");
                     }
                 } else {
-                    // Send this response if the client sents a request with an unsupported method
+                    // Send this response if the client sends a request with an unsupported method
                     if (!sendResponse(ResponseCode.OK, new File(WEB_ROOT, "method-not-supported.html"))) {
                         getLogger().errorLog(socket.getInetAddress().getHostAddress(), LogLevel.INFO, "Error sending response to client");
                     }
@@ -173,13 +171,6 @@ public class ClientConnection implements Runnable {
                 }
             } catch (FileNotFoundException ex) {
                 try {
-                    /*File err = null;
-                    // Send the 404 response and error page if the specified URL is not found
-                    if (!Files.exists(Paths.get(WEB_ROOT + "/" + ResponseCode.FILE_NOT_FOUND.path))) {
-                        system.out.println("gingwr")
-                    } else {
-
-                    }*/
                     if(!sendResponse(ResponseCode.FILE_NOT_FOUND, "<html><head><title>Page not found</title></head><body>404 Page not found</body></html>")){//new File(WEB_ROOT, ResponseCode.FILE_NOT_FOUND.path))) {
                         getLogger().errorLog(socket.getInetAddress().getHostAddress(), LogLevel.INFO, "Error sending response to client");
                     }
@@ -196,11 +187,11 @@ public class ClientConnection implements Runnable {
                     out.close();
                     socket.close();
                 } catch (IOException ex1) {
-                    getLogger().errorLog("", LogLevel.INFO, ex1.getMessage());
+                    getLogger().errorLog("", LogLevel.WARN, ex1.getMessage());
                 }
                 break;
             } catch (IOException ex) {
-                getLogger().errorLog("", LogLevel.INFO, ex.getMessage());
+                getLogger().errorLog("", LogLevel.WARN, ex.getMessage());
                 break;
             }
         }
@@ -214,7 +205,7 @@ public class ClientConnection implements Runnable {
      * Sends a response to the client provided a response code and a file to send
      * @param code - Response code to send
      * @param file - The file to send
-     * @throws IOException
+     * @throws IOException - Thrown if there is an issue writing to the streams
      */
     private boolean sendResponse(ResponseCode code, Object file) throws IOException {
         return sendResponse(code, null, file);
@@ -225,7 +216,7 @@ public class ClientConnection implements Runnable {
      * @param code - Response code to send
      * @param extraHeaders - Extra headers such as cookies
      * @param file - The file to send
-     * @throws IOException
+     * @throws IOException - Thrown if there is an issue writing to the streams
      */
     private boolean sendResponse(ResponseCode code, List<String> extraHeaders, Object file) throws IOException {
         int fileLength;
@@ -236,7 +227,7 @@ public class ClientConnection implements Runnable {
             fileLength = (int) ((File) file).length();
             fileData = Utility.fileToByteArray((File) file);
         } else if (file instanceof String) {
-            fileData = ((String) file).getBytes("UTF-8");
+            fileData = ((String) file).getBytes(StandardCharsets.UTF_8);
             fileLength = fileData.length;
         } else {
             return false;

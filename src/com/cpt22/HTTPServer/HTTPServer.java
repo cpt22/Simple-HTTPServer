@@ -80,7 +80,7 @@ public class HTTPServer implements Runnable {
             this.bindAddr = config.getString("bind-address", "0.0.0.0");
             this.port = config.getInt("port", 80);
             this.version = config.getString("server-version");
-            String webRoot = config.getSection("files").getString("root-dir");
+            String webRoot = config.getSection("files").getString("web-root");
             try {
                 if (!Files.exists(Paths.get(webRoot))) {
                     Files.createDirectories(Paths.get(webRoot));

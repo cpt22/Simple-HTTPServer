@@ -130,6 +130,10 @@ public class Logger {
         }
     }
 
+    /**
+     * Check the error log file length and if it is longer than the max length,
+     * copy the current file into the sequentially highest file and create a new error_log file
+     */
     private void checkErrorLogFileLength() {
         try {
             Path filepath = Paths.get(errorLogFilePath);
