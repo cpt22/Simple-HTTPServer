@@ -84,6 +84,13 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs an http request to the server
+     * @param ip
+     * @param hostname
+     * @param request
+     * @param status
+     */
     public void logRequest(String ip, String hostname, String request, String status) {
         if (enabled) {
             httpLogFileWriter.printf("%-27s %-40s %-23s %-60s %7s %n", ip, hostname, dateFormatter.format(new Date()), request, status);
@@ -92,6 +99,12 @@ public class Logger {
         }
     }
 
+    /**
+     * Logs to the error log file
+     * @param ip - IP address associated with the log message
+     * @param level - How severe the error is
+     * @param message - Message to log
+     */
     public void errorLog(String ip, LogLevel level, String message) {
         if (enabled && (level.val >= errorLogMinLogLevel.val || server.isDebugging())) {
             if (level == LogLevel.DEBUG || server.isDebugging()) {
@@ -114,6 +127,10 @@ public class Logger {
         }
     }
 
+    /**
+     * Checks the log file length and if it is longer than specified in the config,
+     * It will begin a new log file and rename the old one
+     */
     private void checkHttpLogFileLength() {
         try {
             Path filepath = Paths.get(httpLogFilePath);

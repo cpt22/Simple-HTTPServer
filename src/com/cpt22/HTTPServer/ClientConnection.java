@@ -127,8 +127,8 @@ public class ClientConnection implements Runnable {
 
                     // Track visits based on the cookie stored
                     int visitCount = 1;
-                    if (cookies.containsKey("visits") && Utility.isNumeric(cookies.get("visits"))) {
-                        visitCount = Integer.parseInt(cookies.get("visits")) + 1;
+                    if (cookies.containsKey("cpt15visits") && Utility.isNumeric(cookies.get("cpt15visits"))) {
+                        visitCount = Integer.parseInt(cookies.get("cpt15visits")) + 1;
                     }
 
                     // Sets up symbols for replacement within HTML files. This is used to insert the number of visits dynamically into the visits.html
@@ -146,7 +146,7 @@ public class ClientConnection implements Runnable {
 
                     // Specifies additional headers to send (Such as set-cookie headers) along with the standard headers
                     List<String> additionalHeaders = new ArrayList<>();
-                    additionalHeaders.add(Utility.buildCookie("visits", String.valueOf(visitCount), "Path: cpt15"));
+                    additionalHeaders.add(Utility.buildCookie("cpt15visits", String.valueOf(visitCount), "Path: cpt15"));
 
                     // Sends the HTTP response
                     getLogger().logRequest(socket.getInetAddress().getHostAddress(), socket.getInetAddress().getHostName(), headers.get(0), String.valueOf(ResponseCode.OK.code));
